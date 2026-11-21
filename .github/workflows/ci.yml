@@ -1,0 +1,122 @@
+name: DevOps Assessment CI
+
+on:
+  push:
+    branches:
+      - main
+      - feature/**
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint scripts and Dockerfile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: ./scripts
+
+      - name: Run Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: app/Dockerfile
+
+  build-and-test:
+    name: Build and test container
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg BUILD_SHA=${{ github.sha }} \
+            -t devops-command-hub:${{ github.sha }} \
+            ./app
+
+      - name: Check image size
+        run: |
+          IMAGE_SIZE=$(docker image inspect \
+            devops-command-hub:${{ github.sha }} \
+            --format='{{.Size}}')
+          echo "Image size: ${IMAGE_SIZE} bytes"
+          if [ "$IMAGE_SIZE" -ge 60000000 ]; then
+            echo "ERROR: Image exceeds 60 MB limit"
+            exit 1
+          fi
+
+      - name: Run container
+        run: |
+          docker run -d \
+            --name devops-command-hub \
+            -p 8080:8080 \
+            devops-command-hub:${{ github.sha }}
+
+      - name: Wait for container health
+        run: |
+          for i in $(seq 1 15); do
+            STATUS=$(docker inspect \
+              --format='{{.State.Health.Status}}' \
+              devops-command-hub)
+            echo "Container health: $STATUS"
+            if [ "$STATUS" = "healthy" ]; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs devops-command-hub
+          exit 1
+
+      - name: Run application health check
+        run: |
+          chmod +x scripts/healthcheck.sh
+          ./scripts/healthcheck.sh http://localhost:8080/healthz
+
+      - name: Clean up container
+        if: always()
+        run: docker rm -f devops-command-hub || true
+
+  publish:
+    name: Publish image to GHCR
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set lowercase image name
+        run: |
+          IMAGE_NAME="ghcr.io/${GITHUB_REPOSITORY_OWNER}/devops-command-hub"
+          IMAGE_NAME=$(printf '%s' "$IMAGE_NAME" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_NAME=$IMAGE_NAME" >> "$GITHUB_ENV"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./app
+          push: true
+          build-args: |
+            BUILD_SHA=${{ github.sha }}
+          tags: ${{ env.IMAGE_NAME }}:latest

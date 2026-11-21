@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Command Hub | Isaac Ambi</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="cheet.css">
+</head>
+
+<body>
+
+    <!-- =========================
+         TOP NAVIGATION
+         ========================= -->
+    <div class="top-nav">
+
+        <!-- Left side: Hamburger + Title -->
+        <div class="top-nav-left">
+            <button class="sidebar-toggle-btn" id="toggleSidebar" aria-label="Toggle sidebar">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="logo">DevOps Command Hub</div>
+        </div>
+
+        <!-- Right side: Search + Links -->
+        <div class="top-nav-right">
+            <div class="search-bar">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search commands..."
+                    aria-label="Search commands"
+                >
+            </div>
+
+            <div class="nav-links">
+                <button class="nav-link" onclick="openAbout()">About</button>
+                <button class="nav-link" onclick="openContact()">Contact</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================
+         MAIN CONTAINER
+         ========================= -->
+    <div class="container">
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+
+            <div class="category">
+                <div class="category-title">Operating Systems</div>
+                <div class="menu-item active" data-category="windows">
+                    <span class="menu-icon">&#x1F5A5;</span> Windows
+                </div>
+                <div class="menu-item" data-category="linux">
+                    <span class="menu-icon">&#x1F427;</span> Linux
+                </div>
+                <div class="menu-item" data-category="macos">
+                    <span class="menu-icon">&#x1F34E;</span> macOS
+                </div>
+            </div>
+
+            <div class="category">
+                <div class="category-title">Networking</div>
+                <div class="menu-item" data-category="networking">
+                    <span class="menu-icon">&#x1F310;</span> Network Commands
+                </div>
+                <div class="menu-item" data-category="security">
+                    <span class="menu-icon">&#x1F512;</span> Security Tools
+                </div>
+            </div>
+
+            <div class="category">
+                <div class="category-title">Development</div>
+                <div class="menu-item" data-category="git">
+                    <span class="menu-icon">&#x1F4E6;</span> Git Commands
+                </div>
+                <div class="menu-item" data-category="docker">
+                    <span class="menu-icon">&#x1F433;</span> Docker
+                </div>
+            </div>
+
+            <div class="category">
+                <div class="category-title">Databases</div>
+                <div class="menu-item" data-category="mysql">
+                    <span class="menu-icon">&#x1F5C4;</span> MySQL
+                </div>
+                <div class="menu-item" data-category="postgresql">
+                    <span class="menu-icon">&#x1F419;</span> PostgreSQL
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Content Area -->
+        <div class="content" id="contentArea">
+            <!-- Dynamic content rendered by cheet.js -->
+        </div>
+        
+        
+        
+    </div>
+    <!-- =========================
+        FOOTER
+    ========================= -->
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-left">
+                <h3>DevOps Command Hub</h3>
+                <p>A practical command reference for DevOps, Linux, Docker, networking, and automation.</p>
+<p><strong>Created by:</strong> Isaac Ambi</p>
+<p><strong>Assessment date:</strong> 20 November 2026</p>
+<p><strong>Docker build:</strong> <span id="build-sha">BUILD_SHA_PLACEHOLDER</span></p>
+            </div>
+
+            <div class="footer-right">
+                <span class="footer-label">Connect</span>
+                <div class="footer-socials">
+                    <a href="#" title="GitHub">GitHub</a>
+                    <a href="#" title="LinkedIn">LinkedIn</a>
+                    <a href="#" title="Twitter / X">X</a>
+                    <a href="#" title="Email">Email</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">&#169; 2026 Isaac Ambi &#183; DevOps Intern Final Assessment</div>
+    </footer>
+
+    <!-- =========================
+         SCRIPTS
+         ========================= -->
+    <script src="commands.js"></script>
+    <script src="cheet.js"></script>
+
+</body>
+</html>
+
+
+
