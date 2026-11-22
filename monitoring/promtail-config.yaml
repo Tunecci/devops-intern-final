@@ -1,0 +1,30 @@
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: nomad-nginx
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          app: devops-command-hub
+          environment: local
+          source: nomad-allocation
+          __path__: /var/log/nomad/*.log
+
+    pipeline_stages:
+      - regex:
+          expression: '.*"(?P<method>[A-Z]+) (?P<path>[^ ]+) HTTP/[^"]+" (?P<status>[0-9]{3})'
+
+      - labels:
+          method:
+          status:
